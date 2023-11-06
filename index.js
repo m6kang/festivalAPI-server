@@ -32,6 +32,8 @@ require("dotenv").config();
     });
   });
 
+  await browser.close();
+
   const festivalsList = allFestivals.filter(
     (festival) =>
       !festival["url"].includes("insomniac.com") &&
@@ -46,7 +48,7 @@ require("dotenv").config();
     res.send(festivalsList);
   });
 
-  await browser.close();
+  
   festivalsList.forEach(function (festival) {
     app.get(
       "/api/festivals/".concat(festival["name"].replaceAll(" ", "")),
@@ -61,6 +63,9 @@ require("dotenv").config();
             (e) => e.textContent
           )
         );
+
+        await browser.close();
+
         for (let i = 0; i < lineup.length; i++) {
           if (
             lineup[i].includes("Sunset Set") ||
@@ -116,7 +121,7 @@ require("dotenv").config();
           return a.toLowerCase() < b.toLowerCase() ? -1 : 1;
         });
 
-        await browser.close();
+        
         console.log("Sent Lineup");
         res.send(lineupNoDupe);
       }
