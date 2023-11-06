@@ -5,6 +5,7 @@ require("dotenv").config();
 
 (async () => {
   const browser = await puppeteer.launch({
+    userDataDir: "./cache",
     args: [
       "--disable-setuid-sandbox",
       "--no-sandbox",
@@ -53,7 +54,19 @@ require("dotenv").config();
     app.get(
       "/api/festivals/".concat(festival["name"].replaceAll(" ", "")),
       async function (req, res) {
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+          userDataDir: "./cache",
+          args: [
+            "--disable-setuid-sandbox",
+            "--no-sandbox",
+            "--single-process",
+            "--no-zygote",
+          ],
+          executablePath:
+            process.env.NODE_ENV === "production"
+              ? process.env.PUPPETEER_EXECUTABLE_PATH
+              : puppeteer.executablePath(),
+        });
         const page = await browser.newPage();
         await page.goto(festival["url"].concat("/lineup"), { timeout: 0 });
 
