@@ -28,7 +28,7 @@ const puppeteer = require('puppeteer');
   await browser.close();
   festivalsList.forEach(function(festival) {
     app.get('/api/festivals/'.concat(festival["name"].replaceAll(" ", "")), async function (req, res) {
-      const browser = await puppeteer.launch({headless: "new"});
+      const browser = await puppeteer.launch();
       const page = await browser.newPage();
       await page.goto(festival["url"].concat("/lineup"), {timeout: 0});
 
