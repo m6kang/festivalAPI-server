@@ -11,6 +11,8 @@ require("dotenv").config();
       "--no-sandbox",
       "--single-process",
       "--no-zygote",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
     ],
     executablePath:
       process.env.NODE_ENV === "production"
@@ -49,7 +51,6 @@ require("dotenv").config();
     res.send(festivalsList);
   });
 
-  
   festivalsList.forEach(function (festival) {
     app.get(
       "/api/festivals/".concat(festival["name"].replaceAll(" ", "")),
@@ -61,6 +62,8 @@ require("dotenv").config();
             "--no-sandbox",
             "--single-process",
             "--no-zygote",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
           ],
           executablePath:
             process.env.NODE_ENV === "production"
@@ -134,7 +137,6 @@ require("dotenv").config();
           return a.toLowerCase() < b.toLowerCase() ? -1 : 1;
         });
 
-        
         console.log("Sent Lineup");
         res.send(lineupNoDupe);
       }
