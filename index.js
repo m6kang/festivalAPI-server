@@ -1,7 +1,10 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const puppeteer = require("puppeteer");
 require("dotenv").config();
+
+app.use(cors());
 
 (async () => {
   const browser = await puppeteer.launch({
