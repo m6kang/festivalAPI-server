@@ -8,6 +8,7 @@ app.use(cors());
 
 (async () => {
   const browser = await puppeteer.launch({
+    headless: "new",
     userDataDir: "./cache",
     args: [
       "--disable-setuid-sandbox",
@@ -42,9 +43,7 @@ app.use(cors());
 
   const festivalsList = allFestivals.filter(
     (festival) =>
-      !festival["url"].includes("insomniac.com") &&
-      !festival["url"].includes("edsea") &&
-      !festival["url"].includes("holyship") &&
+      !festival["url"].includes("insomniac") &&
       !festival["url"].includes("mexico") &&
       !festival["url"].includes("hotel")
   );
@@ -59,6 +58,7 @@ app.use(cors());
       "/api/festivals/".concat(festival["name"].replaceAll(" ", "")),
       async function (req, res) {
         const browser = await puppeteer.launch({
+          headless: "new",
           userDataDir: "./cache",
           args: [
             "--disable-setuid-sandbox",
@@ -75,13 +75,27 @@ app.use(cors());
         });
         const page = await browser.newPage();
         await page.goto(festival["url"].concat("/lineup"), { timeout: 0 });
-
-        const lineup = await page.evaluate(() =>
+        var lineup;
+        if (festival["url"].includes("edsea")) {
+          lineup = await page.evaluate(() =>
           Array.from(
-            document.querySelectorAll(".js-wp-template-Modal.no-barba"),
-            (e) => e.textContent
-          )
-        );
+              document.querySelectorAll(".art-link"), (e) => e.textContent.replaceAll("\n                                \t\t\t\t\t\t\t\t", "").replaceAll("                                ", "")
+            )
+          );
+        } else if (festival["url"].includes("holyship")) {
+          lineup = await page.evaluate(() =>
+          Array.from(
+              document.querySelectorAll(".lineup-box-title h3"), (e) => e.textContent
+            )
+          );
+        } else {
+          lineup = await page.evaluate(() =>
+          Array.from(
+              document.querySelectorAll(".js-wp-template-Modal.no-barba"), (e) => e.textContent
+            )
+          );
+        }
+        
 
         await browser.close();
 
@@ -105,7 +119,7 @@ app.use(cors());
             lineup[i].includes("&ME, Rampa, Adam Port") ||
             lineup[i].includes("Hybrid") ||
             lineup[i].includes("of Miami") ||
-            lineup[i].includes("True Vine + Sister System")
+            lineup[i].includes("True Vine + Sister System") || lineup[i].includes("(DJ)")
           ) {
             lineup[i] = lineup[i].replace(/ *\([^)]*\) */g, "");
           }
@@ -119,6 +133,12 @@ app.use(cors());
             lineup[i] = lineup[i].substring(
               0,
               lineup[i].indexOf(" presents: ")
+            );
+          }
+          if (lineup[i].includes(" Presents: ")) {
+            lineup[i] = lineup[i].substring(
+              0,
+              lineup[i].indexOf(" Presents: ")
             );
           }
           if (lineup[i].includes(" B2B ")) {
@@ -135,7 +155,15 @@ app.use(cors());
           }
         }
 
-        const lineupNoDupe = [...new Set(lineup)];
+        const lineupNoDupe = lineup.reduce((result, element) => {
+          var normalize = x => typeof x === 'string' ? x.toLowerCase() : x;
+      
+          var normalizedElement = normalize(element);
+          if (result.every(otherElement => normalize(otherElement) !== normalizedElement))
+            result.push(element);
+      
+          return result;
+        }, []);
         lineupNoDupe.sort(function (a, b) {
           return a.toLowerCase() < b.toLowerCase() ? -1 : 1;
         });
