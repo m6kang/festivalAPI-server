@@ -8,7 +8,6 @@ app.use(cors());
 
 (async () => {
   const browser = await puppeteer.launch({
-    headless: "new",
     userDataDir: "./cache",
     args: [
       "--disable-setuid-sandbox",
@@ -58,7 +57,6 @@ app.use(cors());
       "/api/festivals/".concat(festival["name"].replaceAll(" ", "")),
       async function (req, res) {
         const browser = await puppeteer.launch({
-          headless: "new",
           userDataDir: "./cache",
           args: [
             "--disable-setuid-sandbox",
