@@ -43,7 +43,10 @@ app.use(cors());
   const festivalsList = allFestivals.filter(
     (festival) =>
       !festival["url"].includes("insomniac") &&
+      !festival["url"].includes("edsea") &&
+      !festival["url"].includes("chicago") &&
       !festival["url"].includes("mexico") &&
+      !festival["url"].includes("kingdom") &&
       !festival["url"].includes("hotel")
   );
 
