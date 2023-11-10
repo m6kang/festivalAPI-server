@@ -42,7 +42,6 @@ app.use(cors());
 
   const festivalsList = allFestivals.filter(
     (festival) =>
-      !festival["url"].includes("insomniac") &&
       !festival["url"].includes("edsea") &&
       !festival["url"].includes("chicago") &&
       !festival["url"].includes("mexico") &&
@@ -75,12 +74,23 @@ app.use(cors());
               : puppeteer.executablePath(),
         });
         const page = await browser.newPage();
-        await page.goto(festival["url"].concat("/lineup"), { timeout: 0 });
+        if (festival["url"].includes("insomniac.com")) {
+          await page.goto(festival["url"], { timeout: 0 });
+        } else {
+          await page.goto(festival["url"].concat("/lineup"), { timeout: 0 });
+        }
+        
         var lineup;
         if (festival["url"].includes("edsea")) {
           lineup = await page.evaluate(() =>
           Array.from(
               document.querySelectorAll(".art-link"), (e) => e.textContent.replaceAll("\n                                \t\t\t\t\t\t\t\t", "").replaceAll("                                ", "")
+            )
+          );
+        } else if (festival["url"].includes("insomniac.com")) {
+          lineup = await page.evaluate(() =>
+          Array.from(
+              document.querySelectorAll(".card__title"), (e) => e.textContent
             )
           );
         } else if (festival["url"].includes("holyship")) {
