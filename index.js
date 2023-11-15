@@ -49,6 +49,12 @@ app.use(cors());
       !festival["url"].includes("hotel")
   );
 
+  // festivalsList.push({url: "https://www.okeechobeefest.com/lineup/", name: "Okeechobee Music & Arts Festival", image: "https://d3vhc53cl8e8km.cloudfront.net/hello-staging/wp-content/uploads/sites/61/2022/09/19095412/omf_2023_mk_an_fest_site_homepage_header_desktop_3200x1520_r01-scaled.jpg"});
+
+  festivalsList.push({url: "https://hijinxfest.com/artists/", name: "Hijinx Festival", image: "https://hijinxfest.com/wp-content/themes/hijinx-fest/img/fb.jpg"});
+
+  festivalsList.push({url: "https://duskmusicfestival.com", name: "Dusk Music Festival", image: "https://duskmusicfestival.com/wp-content/uploads/2023/06/DUSK23-Website-OnSale.png"});
+
   app.get("/api/festivals", async function (req, res) {
     console.log("Sent All Festivals");
     res.send(festivalsList);
@@ -74,7 +80,7 @@ app.use(cors());
               : puppeteer.executablePath(),
         });
         const page = await browser.newPage();
-        if (festival["url"].includes("insomniac.com")) {
+        if (festival["url"].includes("insomniac.com") || festival["url"].includes("hijinx")) {
           await page.goto(festival["url"], { timeout: 0 });
         } else {
           await page.goto(festival["url"].concat("/lineup"), { timeout: 0 });
@@ -85,6 +91,18 @@ app.use(cors());
           lineup = await page.evaluate(() =>
           Array.from(
               document.querySelectorAll(".art-link"), (e) => e.textContent.replaceAll("\n                                \t\t\t\t\t\t\t\t", "").replaceAll("                                ", "")
+            )
+          );
+        } else if (festival["url"].includes("dusk")) {
+          lineup = await page.evaluate(() =>
+          Array.from(
+              document.querySelectorAll(".artist-name"), (e) => e.textContent
+            )
+          );
+        } else if (festival["url"].includes("hijinx")) {
+          lineup = await page.evaluate(() =>
+          Array.from(
+              document.querySelectorAll(".artist-item-image"), (e) => e.getAttribute("alt")
             )
           );
         } else if (festival["url"].includes("insomniac.com")) {
@@ -130,7 +148,7 @@ app.use(cors());
             lineup[i].includes("&ME, Rampa, Adam Port") ||
             lineup[i].includes("Hybrid") ||
             lineup[i].includes("of Miami") ||
-            lineup[i].includes("True Vine + Sister System") || lineup[i].includes("(DJ)")
+            lineup[i].includes("True Vine + Sister System") || lineup[i].includes("(DJ)") || lineup[i].includes("(Drum & Bass Set)") || lineup[i].includes("(FL)") || lineup[i].includes("(Chee x Jon Casey)") || lineup[i].includes("(Playground Set)") 
           ) {
             lineup[i] = lineup[i].replace(/ *\([^)]*\) */g, "");
           }
