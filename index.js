@@ -51,7 +51,7 @@ app.use(cors());
 
   // festivalsList.push({url: "https://www.okeechobeefest.com/lineup/", name: "Okeechobee Music & Arts Festival", image: "https://d3vhc53cl8e8km.cloudfront.net/hello-staging/wp-content/uploads/sites/61/2022/09/19095412/omf_2023_mk_an_fest_site_homepage_header_desktop_3200x1520_r01-scaled.jpg"});
 
-  festivalsList.push({url: "https://hijinxfest.com/artists/", name: "Hijinx Festival", image: "https://hijinxfest.com/wp-content/themes/hijinx-fest/img/fb.jpg"});
+  // festivalsList.push({url: "https://hijinxfest.com/artists/", name: "Hijinx Festival", image: "https://hijinxfest.com/wp-content/themes/hijinx-fest/img/fb.jpg"});
 
   // festivalsList.push({url: "https://duskmusicfestival.com", name: "Dusk Music Festival", image: "https://duskmusicfestival.com/wp-content/uploads/2023/06/DUSK23-Website-OnSale.png"});
 
