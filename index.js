@@ -79,10 +79,22 @@ app.use(cors());
               : puppeteer.executablePath(),
         });
         const page = await browser.newPage();
+
+        const blockedDomains = [
+          'https://pagead2.googlesyndication.com',
+          'https://creativecdn.com',
+          'https://www.googletagmanager.com',
+          'https://cdn.krxd.net',
+          'https://adservice.google.com',
+          'https://cdn.concert.io',
+          'https://z.moatads.com',
+          'https://cdn.permutive.com'];
+
         await page.setRequestInterception(true);
 
         page.on("request", (req) => {
-          if (req.resourceType() === "image") {
+          const url = req.url();
+          if (req.resourceType() === "image" || blockedDomains.some((d) => url.startsWith(d))) {
             req.abort();
           } else {
             req.continue();
