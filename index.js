@@ -94,7 +94,7 @@ app.use(cors());
 
         page.on("request", (req) => {
           const url = req.url();
-          if (req.resourceType() === "image" || blockedDomains.some((d) => url.startsWith(d))) {
+          if (req.resourceType() === "image" || req.resourceType() === "stylesheet" || req.resourceType() === "font" || blockedDomains.some((d) => url.startsWith(d))) {
             req.abort();
           } else {
             req.continue();
