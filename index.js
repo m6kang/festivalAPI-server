@@ -22,7 +22,7 @@ app.use(cors());
         : puppeteer.executablePath(),
   });
   const page = await browser.newPage();
-  await page.goto("https://www.insomniac.com/events/festivals/", { waitUntil: 'domcontentloaded' });
+  await page.goto("https://www.insomniac.com/events/festivals/", { waitUntil: 'domcontentloaded' , timeout: 0});
 
   const allFestivals = await page.evaluate(() => {
     const festivals = document.querySelectorAll(".card__img");
@@ -78,9 +78,9 @@ app.use(cors());
         });
         const page = await browser.newPage();
         if (festival["url"].includes("insomniac.com") || festival["url"].includes("hijinx")) {
-          await page.goto(festival["url"], { waitUntil: 'domcontentloaded' });
+          await page.goto(festival["url"], { waitUntil: 'domcontentloaded', timeout: 0});
         } else {
-          await page.goto(festival["url"].concat("/lineup"), { waitUntil: 'domcontentloaded' });
+          await page.goto(festival["url"].concat("/lineup"), { waitUntil: 'domcontentloaded' , timeout: 0});
         }
         
         var lineup;
