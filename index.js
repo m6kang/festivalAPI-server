@@ -22,7 +22,10 @@ app.use(cors());
         : puppeteer.executablePath(),
   });
   const page = await browser.newPage();
-  await page.goto("https://www.insomniac.com/events/festivals/", { waitUntil: 'domcontentloaded' , timeout: 0});
+  await page.goto("https://www.insomniac.com/events/festivals/", {
+    waitUntil: "domcontentloaded",
+    timeout: 0,
+  });
 
   const allFestivals = await page.evaluate(() => {
     const festivals = document.querySelectorAll(".card__img");
@@ -45,7 +48,6 @@ app.use(cors());
       !festival["url"].includes("kingdom") &&
       !festival["url"].includes("hotel")
   );
-
 
   // festivalsList.push({url: "https://www.okeechobeefest.com/lineup/", name: "Okeechobee Music & Arts Festival", image: "https://d3vhc53cl8e8km.cloudfront.net/hello-staging/wp-content/uploads/sites/61/2022/09/19095412/omf_2023_mk_an_fest_site_homepage_header_desktop_3200x1520_r01-scaled.jpg"});
 
@@ -77,51 +79,77 @@ app.use(cors());
               : puppeteer.executablePath(),
         });
         const page = await browser.newPage();
-        if (festival["url"].includes("insomniac.com") || festival["url"].includes("hijinx")) {
-          await page.goto(festival["url"], { waitUntil: 'domcontentloaded', timeout: 0});
+        await page.setRequestInterception(true);
+
+        page.on("request", (req) => {
+          if (req.resourceType() === "image") {
+            req.abort();
+          } else {
+            req.continue();
+          }
+        });
+        if (
+          festival["url"].includes("insomniac.com") ||
+          festival["url"].includes("hijinx")
+        ) {
+          await page.goto(festival["url"], {
+            waitUntil: "domcontentloaded",
+            timeout: 0,
+          });
         } else {
-          await page.goto(festival["url"].concat("/lineup"), { waitUntil: 'domcontentloaded' , timeout: 0});
+          await page.goto(festival["url"].concat("/lineup"), {
+            waitUntil: "domcontentloaded",
+            timeout: 0,
+          });
         }
-        
+
         var lineup;
         if (festival["url"].includes("edsea")) {
           lineup = await page.evaluate(() =>
-          Array.from(
-              document.querySelectorAll(".art-link"), (e) => e.textContent.replaceAll("\n                                \t\t\t\t\t\t\t\t", "").replaceAll("                                ", "")
+            Array.from(document.querySelectorAll(".art-link"), (e) =>
+              e.textContent
+                .replaceAll(
+                  "\n                                \t\t\t\t\t\t\t\t",
+                  ""
+                )
+                .replaceAll("                                ", "")
             )
           );
         } else if (festival["url"].includes("dusk")) {
           lineup = await page.evaluate(() =>
-          Array.from(
-              document.querySelectorAll(".artist-name"), (e) => e.textContent
+            Array.from(
+              document.querySelectorAll(".artist-name"),
+              (e) => e.textContent
             )
           );
         } else if (festival["url"].includes("hijinx")) {
           lineup = await page.evaluate(() =>
-          Array.from(
-              document.querySelectorAll(".artist-item-image"), (e) => e.getAttribute("alt")
+            Array.from(document.querySelectorAll(".artist-item-image"), (e) =>
+              e.getAttribute("alt")
             )
           );
         } else if (festival["url"].includes("insomniac.com")) {
           lineup = await page.evaluate(() =>
-          Array.from(
-              document.querySelectorAll(".card__title"), (e) => e.textContent
+            Array.from(
+              document.querySelectorAll(".card__title"),
+              (e) => e.textContent
             )
           );
         } else if (festival["url"].includes("holyship")) {
           lineup = await page.evaluate(() =>
-          Array.from(
-              document.querySelectorAll(".lineup-box-title h3"), (e) => e.textContent
+            Array.from(
+              document.querySelectorAll(".lineup-box-title h3"),
+              (e) => e.textContent
             )
           );
         } else {
           lineup = await page.evaluate(() =>
-          Array.from(
-              document.querySelectorAll(".js-wp-template-Modal.no-barba"), (e) => e.textContent
+            Array.from(
+              document.querySelectorAll(".js-wp-template-Modal.no-barba"),
+              (e) => e.textContent
             )
           );
         }
-        
 
         await browser.close();
 
@@ -145,7 +173,12 @@ app.use(cors());
             lineup[i].includes("&ME, Rampa, Adam Port") ||
             lineup[i].includes("Hybrid") ||
             lineup[i].includes("of Miami") ||
-            lineup[i].includes("True Vine + Sister System") || lineup[i].includes("(DJ)") || lineup[i].includes("(Drum & Bass Set)") || lineup[i].includes("(FL)") || lineup[i].includes("(Chee x Jon Casey)") || lineup[i].includes("(Playground Set)") 
+            lineup[i].includes("True Vine + Sister System") ||
+            lineup[i].includes("(DJ)") ||
+            lineup[i].includes("(Drum & Bass Set)") ||
+            lineup[i].includes("(FL)") ||
+            lineup[i].includes("(Chee x Jon Casey)") ||
+            lineup[i].includes("(Playground Set)")
           ) {
             lineup[i] = lineup[i].replace(/ *\([^)]*\) */g, "");
           }
@@ -182,12 +215,16 @@ app.use(cors());
         }
 
         const lineupNoDupe = lineup.reduce((result, element) => {
-          var normalize = x => typeof x === 'string' ? x.toLowerCase() : x;
-      
+          var normalize = (x) => (typeof x === "string" ? x.toLowerCase() : x);
+
           var normalizedElement = normalize(element);
-          if (result.every(otherElement => normalize(otherElement) !== normalizedElement))
+          if (
+            result.every(
+              (otherElement) => normalize(otherElement) !== normalizedElement
+            )
+          )
             result.push(element);
-      
+
           return result;
         }, []);
         lineupNoDupe.sort(function (a, b) {
